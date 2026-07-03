@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Noita - Wiki de progression</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://cdn.quilljs.com" />
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="#home" aria-label="Retour a l'accueil">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Noita Codex</span>
+      </a>
+      <div class="search-box">
+        <input id="searchInput" type="search" placeholder="Rechercher dans les articles" autocomplete="off" />
+        <div id="searchResults" class="search-results" hidden></div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">Articles</div>
+        <nav id="articleNav" class="article-nav" aria-label="Articles principaux"></nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="section-title">Consultes recemment</div>
+        <div id="recentViews" class="recent-list"></div>
+      </div>
+    </aside>
+
+    <main class="content-shell">
+      <section id="homeView" class="view">
+        <div class="intro-band">
+          <div>
+            <p class="eyebrow">Wiki personnel Noita</p>
+            <h1>Cartographier les mecaniques, version apres version.</h1>
+            <p>
+              Ce site documente ta progression dans la comprehension de Noita :
+              sorts, baguettes, alchimie, biomes, hypotheses et revisions successives.
+            </p>
+          </div>
+          <button id="newArticleHome" class="primary-btn" type="button">Nouvel article</button>
+        </div>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Articles recemment mis a jour</h2>
+          </div>
+          <div id="updatedFeed" class="feed-list"></div>
+        </section>
+      </section>
+
+      <section id="articleView" class="view" hidden>
+        <article class="article-layout">
+          <div class="article-toolbar">
+            <button id="backHome" class="ghost-btn" type="button">Accueil</button>
+            <button id="editArticle" class="primary-btn" type="button">Modifier</button>
+          </div>
+
+          <div class="article-header">
+            <div>
+              <p id="articleCategory" class="eyebrow"></p>
+              <h1 id="articleTitle"></h1>
+            </div>
+            <div class="article-meta">
+              <span id="versionTimestamp"></span>
+              <span id="articleUpdated"></span>
+            </div>
+          </div>
+
+          <div id="versionControls" class="version-controls">
+            <label for="versionSlider">Historique de comprehension</label>
+            <input id="versionSlider" type="range" min="0" max="0" value="0" />
+            <select id="versionSelect" aria-label="Choisir une version"></select>
+          </div>
+
+          <div id="articleBody" class="article-body"></div>
+        </article>
+      </section>
+
+      <section id="editorView" class="view" hidden>
+        <form id="editorForm" class="editor-layout">
+          <div class="editor-topbar">
+            <button id="cancelEdit" class="ghost-btn" type="button">Annuler</button>
+            <button class="primary-btn" type="submit">Enregistrer une version</button>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              Titre
+              <input id="titleField" required maxlength="100" />
+            </label>
+            <label>
+              Categorie
+              <input id="categoryField" maxlength="60" placeholder="Sorts, Alchimie, Biomes..." />
+            </label>
+            <label>
+              Slug interne
+              <input id="slugField" required pattern="[a-z0-9-]+" />
+            </label>
+            <label>
+              Note de revision
+              <input id="revisionNoteField" maxlength="120" placeholder="Ce que cette version clarifie" />
+            </label>
+          </div>
+
+          <div class="editor-tools">
+            <button id="insertInternalLink" class="ghost-btn" type="button">Lien interne</button>
+            <label class="file-button">
+              Inserer image
+              <input id="imageUpload" type="file" accept="image/*" hidden />
+            </label>
+          </div>
+
+          <div id="quillToolbar">
+            <span class="ql-formats">
+              <select class="ql-header">
+                <option value="1">Titre 1</option>
+                <option value="2">Titre 2</option>
+                <option value="" selected>Texte</option>
+              </select>
+              <button class="ql-bold" type="button" title="Gras">B</button>
+              <button class="ql-italic" type="button" title="Italique">I</button>
+              <button class="ql-code-block" type="button" title="Bloc code">Code</button>
+              <button class="ql-blockquote" type="button" title="Citation">Citation</button>
+            </span>
+            <span class="ql-formats">
+              <button class="ql-list" value="ordered" type="button" title="Liste ordonnee">1.</button>
+              <button class="ql-list" value="bullet" type="button" title="Liste">Liste</button>
+              <button class="ql-link" type="button" title="Lien">Lien</button>
+            </span>
+          </div>
+          <div id="editor"></div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Credits : BAGO</span>
+      <span id="globalUpdated">Derniere mise a jour globale : -</span>
+    </footer>
+
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

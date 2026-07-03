@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: noita
+    runtime: node
+    buildCommand: yarn install
+    startCommand: yarn start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: noita-db
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: https://fluffy-omelette.github.io,http://127.0.0.1:5173,https://noita.onrender.com
+
+databases:
+  - name: noita-db
+    plan: free
