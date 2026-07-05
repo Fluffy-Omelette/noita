@@ -48,6 +48,20 @@ app.get("/api/health", (_request, response) => {
   response.json({ ok: true, database: Boolean(pool) });
 });
 
+// Middleware de sécurité : vérifie la clé secrète pour les écritures
+function requireAdmin(request, response, next) {
+  const clientSecret = request.headers["x-admin-secret"];
+  const serverSecret = process.env.ADMIN_SECRET;
+
+  // Si aucune clé n'est configurée sur le serveur ou si elle ne correspond pas
+  if (!serverSecret || clientSecret !== serverSecret) {
+    response.status(401).json({ error: "Accès non autorisé : Clé secrète invalide ou manquante." });
+    return; // On arrête tout, la requête n'ira pas jusqu'à la base de données
+  }
+  
+  next(); // La clé est bonne, on autorise le passage vers la base de données !
+}
+
 app.get("/api/articles", async (_request, response, next) => {
   if (!requireDatabase(response)) return;
   try {
@@ -81,7 +95,7 @@ app.get("/api/articles", async (_request, response, next) => {
   }
 });
 
-app.post("/api/articles", async (request, response, next) => {
+app.post("/api/articles", requireAdmin, async (request, response, next) => {
   if (!requireDatabase(response)) return;
   const article = request.body;
   const firstVersion = article.versions?.[0];
@@ -118,7 +132,7 @@ app.post("/api/articles", async (request, response, next) => {
   }
 });
 
-app.post("/api/articles/:slug/revisions", async (request, response, next) => {
+app.post("/api/articles/:slug/revisions", requireAdmin, async (request, response, next) => {
   if (!requireDatabase(response)) return;
   const { slug } = request.params;
   const { title, category, updatedAt, version } = request.body;

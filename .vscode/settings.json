@@ -1,0 +1,21 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true
+                }
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "dpg-d93tnupkh4rs73e1kik0-a.oregon-postgres.render.com",
+            "port": 5432,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "Noita",
+            "database": "noita_db",
+            "username": "noita_db_user",
+            "password": "rkjXL95VAqPKjWcUcIlvNcpODTWZBPxK"
+        }
+    ]
+}

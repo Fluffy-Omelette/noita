@@ -125,21 +125,32 @@
     }
   }
 
-  async function persistNewArticle(article) {
-    if (!apiBaseUrl) return;
-    const response = await fetch(`${apiBaseUrl}/api/articles`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(article)
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+async function persistNewArticle(article) {
+  if (!apiBaseUrl) return;
+  const response = await fetch(`${apiBaseUrl}/api/articles`, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json",
+      "x-admin-secret": getAdminSecret() // <-- ON AJOUTE LE BADGE ICI !
+    },
+    body: JSON.stringify(article)
+  });
+  
+  if (response.status === 401) {
+    alert("Clé secrète incorrecte ! Modification refusée.");
+    localStorage.removeItem("noita-admin-secret"); // On efface la mauvaise clé
+    throw new Error("Non autorisé");
   }
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+}
 
   async function persistRevision(article, version) {
     if (!apiBaseUrl) return;
     const response = await fetch(`${apiBaseUrl}/api/articles/${encodeURIComponent(article.slug)}/revisions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {  "Content-Type": "application/json",
+                  "x-admin-secret": getAdminSecret() // <-- ON AJOUTE LE BADGE ICI !
+       },
       body: JSON.stringify({
         title: article.title,
         category: article.category,
@@ -147,8 +158,24 @@
         version
       })
     });
+    if (response.status === 401) {
+    alert("Clé secrète incorrecte ! Modification refusée.");
+    localStorage.removeItem("noita-admin-secret"); // On efface la mauvaise clé
+    throw new Error("Non autorisé");
+  }
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
   }
+
+  function getAdminSecret() {
+  let secret = localStorage.getItem("noita-admin-secret");
+  if (!secret) {
+    secret = prompt("Veuillez entrer la clé secrète d'administration Noita :");
+    if (secret) {
+      localStorage.setItem("noita-admin-secret", secret.trim());
+    }
+  }
+  return secret || "";
+}
 
   function formatDate(iso) {
     return new Intl.DateTimeFormat("fr-FR", {
@@ -523,6 +550,36 @@
     document.addEventListener("click", (event) => {
       if (!event.target.closest(".search-box")) els.searchResults.hidden = true;
     });
+    document.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === "k") {
+        event.preventDefault(); // Empêche le comportement par défaut du navigateur
+        
+        const currentSecret = localStorage.getItem("noita-admin-secret");
+        if (currentSecret) {
+          // Si on est déjà admin, on demande si on veut se déconnecter
+          if (confirm("Mode Admin actif. Veux-tu te déconnecter et cacher les boutons ?")) {
+            localStorage.removeItem("noita-admin-secret");
+            checkAdminDisplay();
+          }
+        } else {
+          // Si on n'est pas admin, on demande le mot de passe
+          const secret = prompt("Accès Admin Noita : Entrez la clé secrète");
+          if (secret) {
+            localStorage.setItem("noita-admin-secret", secret.trim());
+            checkAdminDisplay();
+            alert("Mode administrateur déverrouillé !");
+          }
+        }
+      }
+    });
+  }
+
+function checkAdminDisplay() {
+    const isAdmin = Boolean(localStorage.getItem("noita-admin-secret"));
+    els.newArticleHome.hidden = !isAdmin;
+    if (els.editArticle) {
+      els.editArticle.hidden = !isAdmin;
+    }
   }
 
   function routeFromHash() {
@@ -537,5 +594,6 @@
   bindEvents();
   renderShell();
   routeFromHash();
+  checkAdminDisplay();
   syncFromRemote();
 })();
